@@ -1,0 +1,4 @@
+pulumi>=3.16.0
+pulumi-aws>=4.25.0
+requests>=2.25
+boto3
