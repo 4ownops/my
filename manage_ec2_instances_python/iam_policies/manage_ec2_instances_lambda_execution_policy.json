@@ -1,0 +1,65 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+		{
+            "Sid": "sqsRoleForManageEc2IntancesLambda",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:DeleteMessage",
+                "sqs:GetQueueUrl",
+                "sqs:SendMessageBatch",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:ListQueueTags",
+                "sqs:ListDeadLetterSourceQueues",
+                "sqs:DeleteMessageBatch",
+                "sqs:PurgeQueue",
+                "sqs:ChangeMessageVisibilityBatch",
+                "sqs:SetQueueAttributes"
+            ],
+            "Resource": "arn:aws:sqs:eu-central-1:#{devinfra_acciount_id}:manage_ec2_instances_queue"
+        },
+		{
+            "Sid": "logs",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+        },
+		{
+            "Sid": "genieDevPreRole",
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::#{genieDev_acciount_id}:role/start_stop_ec2_assume_role"
+        },
+		{
+            "Sid": "notificationsDevPreRole",
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::#{notificationsDevPre_acciount_id}:role/start_stop_ec2_assume_role"
+        },
+		{
+            "Sid": "marketplaceDevPreRole",
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::#{marketplaceDev_acciount_id}:role/start_stop_ec2_assume_role"
+        },
+		{
+            "Sid": "apacsaleDevPreRole",
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::#{apacsaleDev_acciount_id}:role/start_stop_ec2_assume_role"
+        },
+		{
+            "Sid": "personalizationProdRole",
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::#{personalizationProd_acciount_id}:role/start_stop_ec2_assume_role"
+        }
+    ]
+}

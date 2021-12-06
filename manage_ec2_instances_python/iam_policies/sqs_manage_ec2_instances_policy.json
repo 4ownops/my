@@ -1,0 +1,28 @@
+{
+  "Version": "2008-10-17",
+  "Id": "default_policy_ID",
+  "Statement": [
+    {
+      "Sid": "owner_statement",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::#{devinfra_account_id}:root"
+      },
+      "Action": "SQS:*",
+      "Resource": "arn:aws:sqs:eu-central-1:#{devinfra_account_id}:manage_ec2_instances_queue"
+    },
+    {
+      "Sid": "receiver_statement",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::#{devinfra_account_id}:role/manage_ec2_instances_lambda_execution_role"
+      },
+      "Action": [
+        "SQS:ChangeMessageVisibility",
+        "SQS:DeleteMessage",
+        "SQS:ReceiveMessage"
+      ],
+      "Resource": "arn:aws:sqs:eu-central-1:#{devinfra_account_id}:manage_ec2_instances_queue"
+    }
+  ]
+}

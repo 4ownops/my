@@ -1,0 +1,112 @@
+lambda:
+    - name: manage_ec2_instances
+      runtime: python3.8
+      app_folder: lambda_manage_ec2_instances
+      timeout: 12
+      handler: lambda_function.lambda_handler
+      aliases: 
+        - name: staging
+        - name: production
+      triggers:
+        sqs: 
+          - name: manage_ec2_instances_queue
+            alias_name: production
+            status: enabled
+        event_bridge:
+          - name: marketplace_dev_sydney
+            alias_name: production
+            status: enabled
+            start_schedule_expression: cron(0 2 ? * MON-FRI *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 18 ? * * *)
+            input:
+                role_arn: arn:aws:iam::#{marketplace_dev_account_id}:role/start_stop_ec2_assume_role
+                management_region: ap-southeast-2
+                tag_environment_name: env
+                tag_environment_value: dev
+          - name: marketplace_pre_sydney
+            alias_name: production
+            status: disabled
+            start_schedule_expression: cron(0 2 ? * MON-FRI *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 18 ? * * *)
+            input:
+                role_arn: arn:aws:iam::#{marketplace_dev_account_id}:role/start_stop_ec2_assume_role
+                management_region: ap-southeast-2
+                tag_environment_name: env
+                tag_environment_value: pre
+          - name: marketplace_sbx_sydney
+            alias_name: production
+            status: disabled
+            start_schedule_expression: cron(0 20 ? * SUN *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 17 ? * FRI *)
+            input:
+                role_arn: arn:aws:iam::#{marketplace_dev_account_id}:role/start_stop_ec2_assume_role
+                management_region: ap-southeast-2
+                tag_environment_name: env
+                tag_environment_value: sbx
+          - name: warehouse_dev_pre_sydney
+            alias_name: production
+            status: disabled
+            start_schedule_expression: cron(0 6 ? * MON-FRI *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 18 ? * * *)
+            input:
+                role_arn: arn:aws:iam::#{marketplace_dev_account_id}:role/start_stop_ec2_assume_role
+                management_region: ap-southeast-2
+                tag_environment_name: env
+                tag_environment_value: wh-dev
+          - name: notifications_dev
+            alias_name: production
+            status: enabled
+            start_schedule_expression: cron(0 2 ? * MON-FRI *)
+            stop_schedule_expression: cron(0 13 ? * * *)
+            input:
+              role_arn: arn:aws:iam::#{notifications_dev_account_id}:role/start_stop_ec2_assume_role
+              management_region: ap-southeast-2
+              tag_environment_name: Environment
+              tag_environment_value: Development
+          - name: genie_pre
+            alias_name: production
+            status: disabled
+            start_schedule_expression: cron(0 20 ? * SUN *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 17 ? * FRI *)
+            input:
+                role_arn: arn:aws:iam::#{genie_pre_account_id}:role/start_stop_ec2_assume_role
+                management_region: eu-central-1
+                tag_environment_name: Env
+                tag_environment_value: Pre
+          - name: system_pre
+            alias_name: production
+            status: disabled
+            start_schedule_expression: cron(0 6 ? * MON-FRI *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 18 ? * * *)
+            input:
+                role_arn: arn:aws:iam::#{genie_pre_account_id}:role/start_stop_ec2_assume_role
+                management_region: eu-central-1
+                tag_environment_name: env
+                tag_environment_value: system-pre
+          - name: apacsale_dev
+            alias_name: production
+            status: disabled
+            start_schedule_expression: cron(0 20 ? * SUN *) # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+            stop_schedule_expression: cron(0 17 ? * FRI *)
+            input:
+                role_arn: arn:aws:iam::#{apacsale_dev_account_id}:role/start_stop_ec2_assume_role
+                management_region: eu-central-1
+                tag_environment_name: env
+                tag_environment_value: Dev
+                
+sqs:
+    - name: manage_ec2_instances_queue
+      delay_seconds: 0
+      max_message_size: 2048
+      message_retention_seconds: 1800
+      receive_wait_time_seconds: 0
+      policy: iam_policies\sqs_manage_ec2_instances_policy.json
+
+roles:
+    - name: manage_ec2_instances_lambda_execution_role
+      description: Role for lambda manage_ec2_instances
+      assume_role_policy: iam_policies\assumed_policy.json
+      policies: 
+        - name: manage_ec2_instances_pulumi
+          path_to_json: iam_policies\manage_ec2_instances_lambda_execution_policy.json
+          description: Policy for management ec2 instances
