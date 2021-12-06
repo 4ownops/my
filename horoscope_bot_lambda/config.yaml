@@ -1,0 +1,4 @@
+bot_config:
+  token: '#{token}'
+  url: https://zeapi.yandex.net/lab/api/yalm/text3
+  channel_id: #{channel_id}
