@@ -29,7 +29,7 @@ $title = (Get-Date).ToString('yyyy.MM.dd-hh.mm') + " " + $envName
 $parentId = "577339796"
 $pageContent = @"
 <h1>$envName : </h1>
-<h1>Next instances was successfully updated:</h1>
+<h1>Next instances were successfully updated:</h1>
 <p>$instanceArray</p>
 "@
 
